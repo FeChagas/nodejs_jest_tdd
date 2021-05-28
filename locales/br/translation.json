@@ -10,5 +10,6 @@
     "user_create_success": "Usuário cadastrado",
     "email_failure": "E-mail falhou",
     "account_activation_failure": "Esta conta já esta ativada ou o token é invalido",
-    "account_activation_success": "Conta ativada"
+    "account_activation_success": "Conta ativada",
+    "validation_failure": "Falha na validação"
 }
