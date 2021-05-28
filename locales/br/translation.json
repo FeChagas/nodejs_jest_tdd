@@ -1,0 +1,14 @@
+{
+    "username_null": "Nome de usuário não pode ser nulo",
+    "username_size": "Deve conter de 4 a 32 caracteres",
+    "email_null": "E-mail não pode ser nulo",
+    "email_invalid": "E-mail não é valido",
+    "password_null": "Senha não pode ser nula",
+    "password_size": "Senha deve conter pelo menos 6 caracteres",
+    "password_pattern": "Senha deve conter pelo menos 1 letra minuscula, 1 letra maiuscula e 1 numero",
+    "email_inuse": "E-mail em uso",
+    "user_create_success": "Usuário cadastrado",
+    "email_failure": "E-mail falhou",
+    "account_activation_failure": "Esta conta já esta ativada ou o token é invalido",
+    "account_activation_success": "Conta ativada"
+}
