@@ -11,5 +11,6 @@
     "email_failure": "E-mail falhou",
     "account_activation_failure": "Esta conta já esta ativada ou o token é invalido",
     "account_activation_success": "Conta ativada",
-    "validation_failure": "Falha na validação"
+    "validation_failure": "Falha na validação",
+    "user_not_found": "Usuário não encontrado"
 }
