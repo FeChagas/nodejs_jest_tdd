@@ -19,8 +19,12 @@ const addUser = async () => {
   return await User.create(user);
 };
 
-const postAuthentication = async (credentials) => {
-  return await request(app).post('/api/1.0/auth').send(credentials);
+const postAuthentication = async (credentials, options = {}) => {
+  let agent = request(app).post('/api/1.0/auth');
+  if (options.language) {
+    agent.set('Accept-Language', options.language);
+  }
+  return await agent.send(credentials);
 };
 
 describe('Authentication', () => {
@@ -36,5 +40,34 @@ describe('Authentication', () => {
     expect(response.body.id).toBe(user.id);
     expect(response.body.username).toBe(user.username);
     expect(Object.keys(response.body)).toEqual(['id', 'username']);
+  });
+
+  it('returns 401 when user does not exist', async () => {
+    const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' });
+    expect(response.status).toBe(401);
+  });
+
+  it('returns proper error body when authentication fails', async () => {
+    const nowInMillis = new Date().getTime();
+    const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' });
+    const error = response.body;
+    expect(error.path).toBe('/api/1.0/auth');
+    expect(error.timestamp).toBeGreaterThan(nowInMillis);
+    expect(Object.keys(error)).toEqual(['path', 'timestamp', 'message']);
+  });
+
+  it.each`
+    language | message
+    ${'br'}  | ${'Credenciais invalidas'}
+    ${'en'}  | ${'Incorrect credentials'}
+  `('returns $message when authentication fails and language is set as $language', async ({ language, message }) => {
+    const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' }, { language });
+    expect(response.body.message).toBe(message);
+  });
+
+  it('returns 401 when password is wrong', async () => {
+    await addUser();
+    const response = await postAuthentication({ email: 'user1@mail.com', password: 'password' });
+    expect(response.status).toBe(401);
   });
 });
