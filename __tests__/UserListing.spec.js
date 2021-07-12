@@ -2,13 +2,15 @@ const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
+const en = require('../locales/en/translation.json');
+const br = require('../locales/br/translation.json');
 
 beforeAll(async () => {
   await sequelize.sync();
 });
 
-beforeEach(() => {
-  return User.destroy({ truncate: true });
+beforeEach(async () => {
+  await User.destroy({ truncate: true });
 });
 
 const getUsers = () => {
@@ -120,8 +122,8 @@ describe('Get User', () => {
 
   it.each`
     language | message
-    ${'br'}  | ${'Usuário não encontrado'}
-    ${'en'}  | ${'User not found'}
+    ${'br'}  | ${br.user_not_found}
+    ${'en'}  | ${en.user_not_found}
   `('returns the $message for a unknown user when language is set to $language', async ({ language, message }) => {
     const response = await request(app).get('/api/1.0/users/5').set('Accept-Language', language);
     expect(response.body.message).toBe(message);

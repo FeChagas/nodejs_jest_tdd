@@ -3,6 +3,8 @@ const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
 const bcrypt = require('bcrypt');
+const en = require('../locales/en/translation.json');
+const br = require('../locales/br/translation.json');
 
 beforeAll(async () => {
   await sequelize.sync();
@@ -59,8 +61,8 @@ describe('Authentication', () => {
 
   it.each`
     language | message
-    ${'br'}  | ${'Credenciais invalidas'}
-    ${'en'}  | ${'Incorrect credentials'}
+    ${'br'}  | ${br.authentication_failure}
+    ${'en'}  | ${en.authentication_failure}
   `('returns $message when authentication fails and language is set as $language', async ({ language, message }) => {
     const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' }, { language });
     expect(response.body.message).toBe(message);
@@ -90,8 +92,8 @@ describe('Authentication', () => {
 
   it.each`
     language | message
-    ${'br'}  | ${'Conta desativada'}
-    ${'en'}  | ${'Account is inactive'}
+    ${'br'}  | ${br.inactive_authentication_failure}
+    ${'en'}  | ${en.inactive_authentication_failure}
   `(
     'returns $message when authentication fails for inactive account and language is set as $language',
     async ({ language, message }) => {
