@@ -12,10 +12,11 @@ beforeEach(async () => {
   await User.destroy({ truncate: true });
 });
 
-const addUser = async () => {
-  const user = { username: 'user1', email: 'user1@mail.com', passsword: 'P4ssword', inactive: false };
-  const hash = await bcrypt.hash(user.passsword, 10);
-  user.passsword = hash;
+const activeUser = { username: 'user1', email: 'user1@mail.com', password: 'P4ssword', inactive: false };
+
+const addUser = async (user = { ...activeUser }) => {
+  const hash = await bcrypt.hash(user.password, 10);
+  user.password = hash;
   return await User.create(user);
 };
 
@@ -68,6 +69,45 @@ describe('Authentication', () => {
   it('returns 401 when password is wrong', async () => {
     await addUser();
     const response = await postAuthentication({ email: 'user1@mail.com', password: 'password' });
+    expect(response.status).toBe(401);
+  });
+
+  it('returns 403 when logging in with inactive account', async () => {
+    await addUser({ ...activeUser, inactive: true });
+    const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' });
+    expect(response.status).toBe(403);
+  });
+
+  it('returns proper error body when inactive authentication fails', async () => {
+    await addUser({ ...activeUser, inactive: true });
+    const nowInMillis = new Date().getTime();
+    const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' });
+    const error = response.body;
+    expect(error.path).toBe('/api/1.0/auth');
+    expect(error.timestamp).toBeGreaterThan(nowInMillis);
+    expect(Object.keys(error)).toEqual(['path', 'timestamp', 'message']);
+  });
+
+  it.each`
+    language | message
+    ${'br'}  | ${'Conta desativada'}
+    ${'en'}  | ${'Account is inactive'}
+  `(
+    'returns $message when authentication fails for inactive account and language is set as $language',
+    async ({ language, message }) => {
+      await addUser({ ...activeUser, inactive: true });
+      const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' }, { language });
+      expect(response.body.message).toBe(message);
+    }
+  );
+
+  it('returns 401 when e-mail is not valid', async () => {
+    const response = await postAuthentication({ password: 'P4ssword' });
+    expect(response.status).toBe(401);
+  });
+
+  it('returns 401 when password is not valid', async () => {
+    const response = await postAuthentication({ email: 'user1@mail.com' });
     expect(response.status).toBe(401);
   });
 });
