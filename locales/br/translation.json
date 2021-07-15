@@ -14,5 +14,6 @@
     "validation_failure": "Falha na validação",
     "user_not_found": "Usuário não encontrado",
     "authentication_failure": "Credenciais invalidas",
-    "inactive_authentication_failure": "Conta desativada"
+    "inactive_authentication_failure": "Conta desativada",
+    "unauthorized_user_update": "Você não está autorizado a atualizar usuario"
 }
