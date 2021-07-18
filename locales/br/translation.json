@@ -17,5 +17,6 @@
     "inactive_authentication_failure": "Conta desativada",
     "unauthorized_user_update": "Você não está autorizado a atualizar usuario",
     "unauthorized_user_delete": "Você não está autorizado a apagar usuario",
-    "email_not_inuse": "E-mail não encontrado"
+    "email_not_inuse": "E-mail não encontrado",
+    "password_reset_request_success": "Verifique seu e-mail para resetar sua senha"
 }
