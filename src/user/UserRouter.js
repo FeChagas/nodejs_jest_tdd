@@ -5,6 +5,7 @@ const { check, validationResult } = require('express-validator');
 const ValidationException = require('../error/ValidationException');
 const pagination = require('../middleware/pagination');
 const ForbiddenException = require('../error/ForbiddenException');
+const User = require('./User');
 
 router.post(
   '/api/1.0/users',
@@ -97,19 +98,43 @@ router.delete('/api/1.0/users/:id', async (req, res, next) => {
   res.send();
 });
 
-router.post(
-  '/api/1.0/users/password',
-  check('email').isEmail().withMessage('email_invalid'),
+router.post('/api/1.0/user/password', check('email').isEmail().withMessage('email_invalid'), async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new ValidationException(errors.array()));
+  }
+  try {
+    await UserService.passwordResetRequest(req.body.email);
+    return res.send({ message: req.t('password_reset_request_success') });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const passwordResetTokenValidator = async (req, res, next) => {
+  const user = await User.findOne({ where: { passwordResetToken: req.body.passwordResetToken } });
+  if (!user) {
+    return next(new ForbiddenException('unauthorized_password_reset'));
+  }
+  next();
+};
+
+router.put(
+  '/api/1.0/user/password',
+  passwordResetTokenValidator,
+  check('password')
+    .notEmpty()
+    .withMessage('password_null')
+    .bail()
+    .isLength({ min: 6 })
+    .withMessage('password_size')
+    .bail()
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/)
+    .withMessage('password_pattern'),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return next(new ValidationException(errors.array()));
-    }
-    try {
-      await UserService.passwordResetRequest(req.body.email);
-      return res.send({ message: req.t('password_reset_request_success') });
-    } catch (err) {
-      next(err);
     }
   }
 );
