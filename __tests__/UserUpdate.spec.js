@@ -205,4 +205,62 @@ describe('User Update', () => {
       expect(response.body.validationErrors.username).toBe(message);
     }
   );
+
+  it('returns 200 when image size is exactly 2mb', async () => {
+    const fileWithSize2MB = 'a'.repeat(1024 * 1024 * 2);
+    const base64 = Buffer.from(fileWithSize2MB).toString('base64');
+    const savedUser = await addUser();
+    const validUpdate = { username: 'user1-updated', image: base64 };
+    const response = await putUser(savedUser.id, validUpdate, {
+      auth: { email: savedUser.email, password: 'P4ssword' },
+    });
+    expect(response.status).toBe(200);
+  });
+
+  it('returns 400 when image size exceeds 2mb', async () => {
+    const fileExceedingSize2MB = 'a'.repeat(1024 * 1024 * 2) + 'a';
+    const base64 = Buffer.from(fileExceedingSize2MB).toString('base64');
+    const savedUser = await addUser();
+    const invalidUpdate = { username: 'user1-updated', image: base64 };
+    const response = await putUser(savedUser.id, invalidUpdate, {
+      auth: { email: savedUser.email, password: 'P4ssword' },
+    });
+    expect(response.status).toBe(400);
+  });
+  it('keeps the old image after user only updates username', async () => {
+    const fileInBase64 = readFileAsBase64();
+    const savedUser = await addUser();
+    const validUpdate = { username: 'user1-updated', image: fileInBase64 };
+    const response = await putUser(savedUser.id, validUpdate, {
+      auth: { email: savedUser.email, password: 'P4ssword' },
+    });
+    const firstImage = response.body.image;
+    await putUser(
+      savedUser.id,
+      { username: 'user1-updated2' },
+      {
+        auth: { email: savedUser.email, password: 'P4ssword' },
+      }
+    );
+    const profileImagePath = path.join(profileDirectory, firstImage);
+    expect(fs.existsSync(profileImagePath)).toBe(true);
+    const userInDB = await User.findOne({ where: { id: savedUser.id } });
+    expect(userInDB.image).toBe(firstImage);
+  });
+
+  it.each`
+    language | message
+    ${'br'}  | ${br.profile_image_size}
+    ${'en'}  | ${en.profile_image_size}
+  `('returns $message when file exceeds 2mb when language is $language', async ({ language, message }) => {
+    const fileExceedingSize2MB = 'a'.repeat(1024 * 1024 * 2) + 'a';
+    const base64 = Buffer.from(fileExceedingSize2MB).toString('base64');
+    const savedUser = await addUser();
+    const invalidUpdate = { username: 'user1-updated', image: base64 };
+    const response = await putUser(savedUser.id, invalidUpdate, {
+      auth: { email: savedUser.email, password: 'P4ssword' },
+      language,
+    });
+    expect(response.body.validationErrors.image).toBe(message);
+  });
 });

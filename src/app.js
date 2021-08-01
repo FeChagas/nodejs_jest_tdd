@@ -35,7 +35,7 @@ const app = express();
 
 app.use(middleware.handle(i18next));
 
-app.use(express.json());
+app.use(express.json({ limit: '3mb' }));
 
 app.use('/images', express.static(profileFolder, { maxAge: oneYearInMillis }));
 
