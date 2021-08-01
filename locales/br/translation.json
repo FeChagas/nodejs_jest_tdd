@@ -20,5 +20,6 @@
     "email_not_inuse": "E-mail não encontrado",
     "password_reset_request_success": "Verifique seu e-mail para resetar sua senha",
     "unauthorized_password_reset": "Você não está autorizado a atualizar a sua senha, por favor siga os passos para atualizar a senha novamente",
-    "profile_image_size": "Sua imagem de perfil não pode ser maior que 2mb"
+    "profile_image_size": "Sua imagem de perfil não pode ser maior que 2mb",
+    "unsupported_image_file": "Apenas JPG ou PNG são permitidos"
 }
