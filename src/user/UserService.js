@@ -116,7 +116,7 @@ const updatePassword = async (updateRequest) => {
   user.inactive = false;
   user.activationToken = null;
   await user.save();
-  TokenService.clearTokens(user.id);
+  await TokenService.clearTokens(user.id);
 };
 
 const findByPasswordResetToken = (token) => {
