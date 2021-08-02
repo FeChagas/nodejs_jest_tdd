@@ -6,7 +6,10 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon index",
     "test": "cross-env NODE_ENV=test jest --watch",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:staging": "cross-env NODE_ENV=staging jest --all --runInBand",
+    "migrate:test": "cross-env NODE_ENV=staging sequelize-cli db:migrate",
+    "pretest:staging": "npm run migrate:test"
   },
   "author": "Felipe Chagas",
   "license": "ISC",
