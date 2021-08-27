@@ -1,6 +1,6 @@
 module.exports = {
   database: {
-    database: 'hoaxfy',
+    database: 'hoaxify',
     username: 'my-db-user',
     password: 'db-p4ss',
     dialect: 'sqlite',

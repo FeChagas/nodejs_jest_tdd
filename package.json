@@ -7,7 +7,7 @@
     "start": "cross-env NODE_ENV=development nodemon index",
     "test": "cross-env NODE_ENV=test jest --watch",
     "lint": "eslint .",
-    "test:staging": "cross-env NODE_ENV=staging jest --all --runInBand --forceExit",
+    "test:staging": "cross-env NODE_ENV=staging jest -f --all --runInBand --forceExit",
     "migrate:test": "cross-env NODE_ENV=staging sequelize-cli db:migrate",
     "pretest:staging": "npm run migrate:test"
   },
